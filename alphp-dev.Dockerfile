@@ -1,3 +1,12 @@
+# @description php image base on the alpine 镜像更小. 本镜像用于开发，所以安装了常用工具
+#                       some information
+# ------------------------------------------------------------------------------------
+# @link https://hub.docker.com/_/alpine/      alpine image
+# @link https://hub.docker.com/_/php/         php image
+# @link https://github.com/docker-library/php php dockerfiles
+# ------------------------------------------------------------------------------------
+# @build-example docker build . -f alphp-dev.Dockerfile -t swoft/alphp:dev
+#
 
 FROM swoft/alphp:cli
 LABEL maintainer="liyuzhao <562405704@qq.com>" version="1.0"
