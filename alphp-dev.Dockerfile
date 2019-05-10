@@ -21,21 +21,16 @@ RUN set -ex \
         # install some tools
         && apk update \
         && apk add --no-cache \
-            php7-fpm php7-pcntl \
-            nginx vim wget net-tools git zip unzip apache2-utils mysql-client redis \
+            php7-pcntl \
+            vim wget net-tools git zip unzip apache2-utils mysql-client redis \
         && apk del --purge *-dev \
         && rm -rf /var/cache/apk/* /tmp/* /usr/share/man \
-        # && rm /etc/nginx/conf.d/default.conf /etc/nginx/nginx.conf \
         # install latest composer
         && wget https://getcomposer.org/composer.phar \
-        && mv composer.phar /usr/local/bin/composer \
-        # - config nginx
-        && mkdir /run/nginx \
-        # - config PHP-FPM
+        && mv composer.phar /usr/local/bin/composer && chmod 0775 composer\
         && cd /etc/php7 \
         && { \
             echo "[global]"; \
-            echo "pid = /var/run/php-fpm.pid"; \
             echo "[www]"; \
             echo "user = www-data"; \
             echo "group = www-data"; \
@@ -44,9 +39,6 @@ RUN set -ex \
         && chown -R www-data:www-data /var/www \
         && { \
             echo "#!/bin/sh"; \
-            echo "nginx -g 'daemon on;'"; \
-            # echo "php /var/www/uem.phar taskServer:start -d"; \
-            echo "php-fpm7 -F"; \
         } | tee /run.sh \
         && chmod 755 /run.sh && \
           wget https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-${FILEBEAT_VERSION}-linux-x86_64.tar.gz -O /home/filebeat.tar.gz && \
@@ -59,13 +51,13 @@ RUN set -ex \
           rm -rf filebeat* && \
           apt-get purge -y wget && \
           apt-get autoremove -y && \
-          apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+          apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+          cd /var/www && git clone https://github.com/phper666/alphp/tree/swoft-rpc-client swoft-client && \
+          composer install
+
 
 VOLUME ["/var/www", "/data"]
 
 EXPOSE 9501 80
-
-# COPY docker/config/nginx.conf /etc/nginx/nginx.conf
-# COPY docker/config/app-vhost.conf /etc/nginx/conf.d/app-vhost.conf
 
 CMD /run.sh
